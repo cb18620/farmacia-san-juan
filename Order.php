@@ -1,9 +1,16 @@
+
+
 <?php include('./constant/layout/head.php');?>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
 <?php include('./constant/layout/header.php');?>
 
 <?php include('./constant/layout/sidebar.php');?>
- .
+ 
 <!-- STOCK INCLUIDO -->
+
+
 <?php include('./constant/connect');
 $sql = "SELECT
 o.id,
@@ -24,6 +31,9 @@ ORDER BY o.id DESC"; // Ordena por fecha de manera ascendente
 
 
 $result = $connect->query($sql);
+
+
+
 
 //echo $sql;exit;
 //echo $itemCountRow;exit;
@@ -53,7 +63,7 @@ $result = $connect->query($sql);
                             <a href="add-order.php"><button class="btn btn-primary">Nueva Ventia</button></a>
                          
                                 <div class="table-responsive m-t-40">
-                                    <table id="myTable" class="table table-bordered table-striped">
+                                <table id="miTabla" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
                                         <thead>
                                             <tr>
                                               <th class="text-center">#</th>
@@ -120,6 +130,16 @@ $no+=1;
                             </div>
                         </div>
 
- 
+                        <script>
+$(document).ready( function () {
+    $('#miTabla').DataTable({
+        "language": {
+        "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Spanish.json"
+    },
+    "paging": true, // Asegura que la paginación esté activada
+    "pageLength": 5,
+    });
+} );
+</script>
+
 <?php include('./constant/layout/footer.php');?>
- .
