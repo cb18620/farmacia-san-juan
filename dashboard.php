@@ -161,66 +161,7 @@ if($result = $connect->query($sql)) {
                             <div class="card-header">
                                 <strong class="card-title">Ventas Recientes </strong>
                                 
-                                <div class="table-responsive m-t-40">
-                                    <table id="myTable" class="table table-bordered table-striped">
-                                        <thead>
-                                            <tr>
-                                              <th>N°</th>
-                        <th>Fecha Venta</th>
-                        <th>NOmbre Producto</th>
-                        <th>Total</th>
-                         <th>Total Bs.</th>
-                        <th>Estado de pago</th>
-                                                
-                                            </tr>
-                                       </thead>
-                                       <tbody>
-                                        <?php
-                                        //include('./constant/connect');
-                                        $sql = "SELECT o.uno, o.orderDate, o.clientName, o.clientContact, o.grandTotalValue, o.paymentStatus, o.id, 
-                                        p.product_name AS productName, p.product_id AS productID, oi.total AS itemTotal
-                                        FROM orders o
-                                        LEFT JOIN order_item oi ON o.id = oi.id 
-                                        LEFT JOIN product p ON oi.productName = p.product_id
-                                        WHERE o.delete_status = 0";
- //echo $sql;exit;
-$result=$connect->query($sql);
-//print_r($result);exit;
-foreach ($result as $row) {
-     
-$no+=1;
-    ?>
-                                        <tr>
-                                            <td><?=$no; ?></td>
-                                            <td><?php echo $row['orderDate'] ?></td>
-                                            <td><?php echo $row['productName'] ?></td>
-                                            <td><?php echo $row['itemTotal'] ?></td>
-                                         <td><?php echo $row['grandTotalValue'] ?></td>
-                                             
-                                               
-                                            <td><?php  if($row['paymentStatus']==1)
-                                            {
-                                                 
-                                                 $paymentStatus = "<label class='label label-success' ><h4>PAGADO</h4></label>";
-                                                 echo $paymentStatus;
-                                            }
-                                            else if($row['payment_status']==2){
-                                                $paymentStatus = "<label class='label label-danger'><h4>Advance Payment</h4></label>";
-                                                echo $paymentStatus;
-                                            }else {
-                                                $paymentStatus = "<label class='label label-warning'><h4>NO PAGADO</h4></label>";
-                                                 echo $paymentStatus;
-                                                } // /els
-                                            ?></td>
-                                            
-                                        </tr>
-                                     
-                                    </tbody>
-                                   <?php    
-}
-
-?>
-                               </table>
+                                
                                 </div>
                             </div>
                             

@@ -10,9 +10,7 @@
      <?php
      
              include('./constant/connect.php');
-             // $sql_head_title = "select * from manage_website"; 
-             // $result_head_title = $conn->query($sql_head_title);
-             // $row_head_title = mysqli_fetch_array($result_head_title);
+
              ?>
     <title>Farmacia San Juan</title>
 

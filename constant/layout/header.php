@@ -70,9 +70,9 @@ include('./constant/check.php');
 
         </div>
         <script language="javascript">
-var today = new Date();
-document.getElementById('ti').innerHTML=today;
+// var today = new Date();
+// document.getElementById('ti').innerHTML=today;
 
-var today = new Date();
-document.getElementById('time').innerHTML=today;
+// var today = new Date();
+// document.getElementById('time').innerHTML=today;
  </script>
