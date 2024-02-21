@@ -16,9 +16,9 @@ o.uno,
 o.orderDate,
 o.grandTotalValue,
 o.paymentStatus,
+o.discount, -- Aquí se agrega el campo discount
 GROUP_CONCAT(DISTINCT p.product_name ORDER BY p.product_name SEPARATOR ', ') AS productNames,
-GROUP_CONCAT(DISTINCT oi.total ORDER BY oi.total SEPARATOR ', ') AS itemTotals, 
-GROUP_CONCAT(p.quantity - IFNULL(oi.quantity, 0) ORDER BY p.product_name SEPARATOR ', ') AS stock_restante
+GROUP_CONCAT(DISTINCT oi.total ORDER BY oi.total SEPARATOR ', ') AS itemTotals
 FROM orders o
 LEFT JOIN order_item oi ON o.id = oi.lastid
 LEFT JOIN product p ON oi.productName = p.product_id
@@ -58,8 +58,8 @@ $result = $connect->query($sql);
                                 <th>Fecha de Venta</th>
                                 <th>Nombre Producto</th>
                                 <th>Precio Unitario</th>
+                                <th>Descuento</th>
                                 <th>Total Bs.</th>
-                                <th>Stock</th>
                                 <th>Estado de Pago</th>
                                 <th>Opciones</th>
                             </tr>
@@ -71,12 +71,12 @@ $result = $connect->query($sql);
                         ?>
                             <tr>
                                 <td class="text-center"><?= $no; ?></td>
-                                <td><?php echo htmlspecialchars($row['uno']); ?></td>
-                                <td><?php echo htmlspecialchars($row['orderDate']); ?></td>
-                                <td><?php echo htmlspecialchars($row['productNames']); ?></td> <!-- Nombres de productos concatenados -->
-                                <td><?php echo htmlspecialchars($row['itemTotals']); ?></td> <!-- Totales de ítems concatenados -->
-                                <td><?php echo htmlspecialchars($row['grandTotalValue']); ?></td>
-                                <td><?php echo htmlspecialchars($row['stock_restante']); ?></td>
+                                <td><?php echo htmlspecialchars($row['uno']); ?></td><!-- Num Venta -->
+                                <td><?php echo htmlspecialchars($row['orderDate']); ?></td><!-- Fecha de venta -->
+                                <td><?php echo htmlspecialchars($row['productNames']); ?></td> <!--Nombre  Producto  -->
+                                <td><?php echo htmlspecialchars($row['itemTotals']); ?></td><!-- Precio Unitario -->
+                                <td><?php echo htmlspecialchars($row['discount']); ?></td><!-- Descuento -->
+                                <td><?php echo htmlspecialchars($row['grandTotalValue']); ?></td><!--  -->
                                 <td>
                                     <?php
                                     if($row['paymentStatus'] == 1) {
@@ -89,6 +89,7 @@ $result = $connect->query($sql);
                                     ?>
                                 </td>
                                 <td>
+                                <button type="button" class="btn btn-xs btn-info verDetalle" data-toggle="modal" data-target="#modalDetalle" data-id="<?php echo $row['id']; ?>"><i class="fa fa-eye"></i></button>
                                     <a href="editorder.php?id=<?php echo $row['id']?>"><button type="button" class="btn btn-xs btn-primary"><i class="fa fa-pencil"></i></button></a>
                                     <a href="php_action/removeOrder.php?id=<?php echo $row['id']?>" onclick="return confirm('¿Estás segura de eliminar este registro?')"><button type="button" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></button></a>
                                     <a href="invoiceprint.php?id=<?php echo $row['id']?>"><button type="button" class="btn btn-xs btn-success"><i class="fa fa-print"></i></button></a>
@@ -100,11 +101,49 @@ $result = $connect->query($sql);
                         </tbody>
 
                     </table>
+                    <!-- Modal Detalle -->
+<div class="modal fade" id="modalDetalle" tabindex="-1" aria-labelledby="modalDetalleLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalDetalleLabel">Detalle del Stock</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Aquí se llenará con el detalle del stock -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<!-- Script para ver el detalle -->
+<script>
+$(document).ready(function() {
+    $('.verDetalle').click(function() {
+        var orderId = $(this).data('id'); // Obtener el ID del pedido
+        // Hacer la solicitud AJAX al mismo archivo
+        $.ajax({
+            url: window.location.href, // Usar la URL actual
+            type: 'POST',
+            data: {requestType: 'fetchStockDetails', id: orderId, nocache: new Date().getTime()},
+            success: function(response) {
+                // Llenar el modal con la respuesta del servidor
+                $('#modalDetalle .modal-body').html(response);
+            }
+        });
+    });
+});
+</script>
+
 
 <script>
 $(document).ready(function() {

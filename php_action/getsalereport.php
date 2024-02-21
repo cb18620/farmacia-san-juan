@@ -9,48 +9,7 @@
     <!-- Incluir Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        .container {
-            width: 80%;
-            margin: auto;
-            overflow: hidden;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            text-align: left;
-            padding: 8px;
-        }
-        th {
-            background-color: #4CAF50;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-        .total {
-            font-weight: bold;
-            background-color: #ddd;
-        }
-        
-    .color-venta-1 { 
-        background-color: #FFCCCC;
-     } 
-
-    .color-venta-2 {
-         background-color: #CCCCFF;
-     }
+        /* ... tus estilos existentes ... */
     </style>
 </head>
 <body>
@@ -58,84 +17,93 @@
 <div class="container">
     <h2>Reporte de Ventas</h2>
 
-    <?php 
-    if($_POST) {
+    <form action="" method="post">
+        <div class="form-row">
+            <div class="col">
+                <input type="date" name="startDate" class="form-control" required>
+            </div>
+            <div class="col">
+                <input type="date" name="endDate" class="form-control" required>
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-primary">Generar Reporte</button>
+            </div>
+        </div>
+    </form>
 
+    <?php 
+       $totalSinDescuentoSum = 0;
+       $totalVentasSum = 0;
+       $sumaGananciasSum = 0;
+       $gananciaNetaSum = 0;
+       
+    if($_SERVER['REQUEST_METHOD'] == 'POST') {
         $startDate = $_POST['startDate'];
         $endDate = $_POST['endDate'];
 
-        $sql = "SELECT oi.*, p.product_name, p.rate_compra FROM order_item oi 
-                INNER JOIN product p ON oi.productName = p.product_id 
-                WHERE oi.added_date >= '$startDate' AND oi.added_date <= '$endDate'";
-        $query = $connect->query($sql);
+        // Aquí se debería incluir la lógica de conexión a tu base de datos
+        // $connect es tu objeto de conexión mysqli
 
-        echo '<table class="table table-bordered">';
-        echo '<thead>';
-        echo '<tr>';
-        echo '<th>Nombre medicamento</th>';
-        echo '<th>Cantidad</th>';
-        echo '<th>Total</th>';
-        echo '<th>Ganancia</th>';
-        echo '<th>Nº Venta</th>';
-        echo '<th>Fecha Venta</th>';
-        echo '</tr>';
-        echo '</thead>';
-        echo '<tbody>';
+        $sql = "SELECT
+            o.id AS OrderID,
+            o.orderDate,
+            GROUP_CONCAT(DISTINCT p.product_name ORDER BY p.product_name SEPARATOR ', ') AS ProductsSold,
+            GROUP_CONCAT(DISTINCT CONCAT(p.product_name, ' (', oi.quantity, ' x ', p.rate_compra, ')') ORDER BY p.product_name SEPARATOR ', ') AS PurchaseDetails,
+            SUM(oi.rate * oi.quantity) AS TotalSinDescuento,
+            o.discount,
+            o.grandTotalValue AS TotalVentas,
+            SUM(oi.quantity * p.rate_compra) AS SumaGanancias,
+            (o.grandTotalValue + o.discount) - SUM(oi.quantity * p.rate_compra) AS GananciaNeta
+        FROM orders o
+        JOIN order_item oi ON o.id = oi.lastid
+        JOIN product p ON oi.productName = p.product_id
+        WHERE oi.added_date >= '$startDate' AND oi.added_date <= '$endDate'
+        GROUP BY o.id
+        ORDER BY o.id DESC";
 
-        $totalAmount = 0;
-        $totalProfit = 0;
-        $currentSaleNumber = null;
-        $isOddSale = true;
-        $lastSaleNumber = ""; // Variable para mantener el número de la última venta
-        $colorClass = "color-venta-1"; // Clase de color inicial
-        
-        while ($result = $query->fetch_assoc()) {
+        $result = $connect->query($sql);
 
-            $quantity = floatval($result['quantity']);
-            $rate = floatval($result['rate']);
-            $rate_compra = floatval($result['rate_compra']);
-            $total = $rate * $quantity;
-            $profit = ($rate - $rate_compra) * $quantity;
+        if($result->num_rows > 0) {
+            echo '<table class="table table-bordered">';
+            echo '<thead>';
+            echo '<tr>';
+            echo '<th>ID de Orders</th>';
+            echo '<th>Fecha Venta</th>';
+            echo '<th>Nombre medicamento</th>';
+            echo '<th>Detalles de Compra</th>';
+            echo '<th>Total Sin Descuento</th>';
+            echo '<th>Descuento</th>';
+            echo '<th>Total Ventas</th>';
+            echo '<th>Suma Ganancias</th>';
+            echo '<th>Ganancia Neta</th>';
+            echo '</tr>';
+            echo '</thead>';
+            echo '<tbody>';
 
-            if ($lastSaleNumber !== $result['lastid']) {
-                // Cambia el color de fondo para el nuevo número de venta
-                $colorClass = ($colorClass === "color-venta-1") ? "color-venta-2" : "color-venta-1";
-                $lastSaleNumber = $result['lastid']; // Actualizar el último número de venta
+            // Procesar cada fila de resultados
+            while($row = $result->fetch_assoc()) {
+                echo '<tr>';
+                echo '<td>'.$row['OrderID'].'</td>';
+                echo '<td>'.$row['orderDate'].'</td>';
+                echo '<td>'.$row['ProductsSold'].'</td>';
+                echo '<td>'.$row['PurchaseDetails'].'</td>';
+                echo '<td>'.$row['TotalSinDescuento'].'</td>';
+                echo '<td>'.$row['discount'].'</td>';
+                echo '<td>'.$row['TotalVentas'].'</td>';
+                echo '<td>'.$row['SumaGanancias'].'</td>';
+                echo '<td>'.$row['GananciaNeta'].'</td>';
+                echo '</tr>';
             }
-          
-            echo '<tr class="' . $colorClass . '">';
-            echo '<td>'.$result['product_name'].'</td>';
-            echo '<td>'.$quantity.'</td>';
-            echo '<td>'.number_format($total, 2).'</td>';
-            echo '<td>'.number_format($profit, 2).'</td>';
-            echo '<td>'.$result['lastid'].'</td>';
-            echo '<td>'.$result['added_date'].'</td>';
-            echo '</tr>';    
-
-            $totalAmount += $total;
-            $totalProfit += $profit;
+            echo '</tbody>';
+            echo '</table>';
+        } else {
+            echo '<p>No se encontraron ventas en este rango de fechas.</p>';
         }
-
-        $totalSalesPlusProfit = $totalAmount + $totalProfit;
-
-        echo '</tbody>';
-        echo '<tfoot>';
-        echo '<tr class="total">';
-        echo '<th colspan="2">Total Ventas</th>';
-        echo '<th>'.number_format($totalAmount, 2).'</th>';
-        echo '<th>Total Ganancias</th>';
-        echo '<th>'.number_format($totalProfit, 2).'</th>';
-        echo '<th></th>';
-        echo '</tr>';
-        echo '<tr class="total">';
-        echo '<th colspan="3">Total Ventas + Ganancias</th>';
-        echo '<th>'.number_format($totalSalesPlusProfit, 2).'</th>';
-        echo '<th colspan="2"></th>';
-        echo '</tr>';
-        echo '</tfoot>';
-        echo '</table>';
     }
     ?>
+
+    <!-- Código para mostrar el total de ventas en el pie de tabla (footer) -->
+    <!-- ... -->
 
 </div>
 <div class="footer text-center py-4">

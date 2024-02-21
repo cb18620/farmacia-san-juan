@@ -5,7 +5,8 @@ date_default_timezone_set('America/La_Paz');
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "NOWDEMY_pharmacy";
+$dbname = "bdfarmacia";
+
 
 
 // Create connection

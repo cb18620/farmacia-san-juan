@@ -3,7 +3,7 @@ date_default_timezone_set('America/La_Paz');
 $localhost = "localhost";
 $username = "root";
 $password = "";
-$dbname = "NOWDEMY_pharmacy";
+$dbname = "bdfarmacia";
 $store_url = "http://localhost/dawapharma/";
 // db connection
 $connect = new mysqli($localhost, $username, $password, $dbname);

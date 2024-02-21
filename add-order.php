@@ -182,7 +182,7 @@ $n="VENTA N°-000";
                                             <div class="row">
                                                 <label for="discount" class="col-sm-2 control-label">Descuento</label>
                                                 <div class="col-sm-4">
-                                                  <input type="text" class="form-control" id="discount" name="discount" onkeyup="discountFunc()" autocomplete="off" / pattern="^[0-9]+$"/>
+                                                <input type="text" class="form-control" id="discount" name="discount" onkeyup="discountFunc()" autocomplete="off" pattern="^\d+(\.\d{1,2})?$|^(\d{1,3})(,\d{1,2})?$" />
                                                 </div>
                                                 <label for="grandTotal" class="col-sm-2 control-label">Total</label>
                                                  <div class="col-sm-4">
