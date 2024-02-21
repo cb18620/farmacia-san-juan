@@ -7,9 +7,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reporte de Ventas</title>
     <!-- Incluir Bootstrap CSS -->
+
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        /* ... tus estilos existentes ... */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding-top: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-row {
+            margin-bottom: 20px;
+        }
+        .table {
+            margin-top: 20px;
+        }
+        .table thead th {
+            background-color: #007bff;
+            color: white;
+        }
+        .table tfoot tr.total {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 20px;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -32,11 +62,12 @@
     </form>
 
     <?php 
-       $totalSinDescuentoSum = 0;
-       $totalVentasSum = 0;
-       $sumaGananciasSum = 0;
-       $gananciaNetaSum = 0;
-       
+    // Inicializar variables para sumar totales
+    $totalDiscount = 0;
+    $totalSales = 0;
+    $totalPurchaseCost = 0;
+    $totalProfit = 0;
+
     if($_SERVER['REQUEST_METHOD'] == 'POST') {
         $startDate = $_POST['startDate'];
         $endDate = $_POST['endDate'];
@@ -70,11 +101,10 @@
             echo '<th>ID de Orders</th>';
             echo '<th>Fecha Venta</th>';
             echo '<th>Nombre medicamento</th>';
-            echo '<th>Detalles de Compra</th>';
             echo '<th>Total Sin Descuento</th>';
             echo '<th>Descuento</th>';
             echo '<th>Total Ventas</th>';
-            echo '<th>Suma Ganancias</th>';
+            // echo '<th>Suma Ganancias</th>';
             echo '<th>Ganancia Neta</th>';
             echo '</tr>';
             echo '</thead>';
@@ -86,24 +116,37 @@
                 echo '<td>'.$row['OrderID'].'</td>';
                 echo '<td>'.$row['orderDate'].'</td>';
                 echo '<td>'.$row['ProductsSold'].'</td>';
-                echo '<td>'.$row['PurchaseDetails'].'</td>';
                 echo '<td>'.$row['TotalSinDescuento'].'</td>';
                 echo '<td>'.$row['discount'].'</td>';
                 echo '<td>'.$row['TotalVentas'].'</td>';
-                echo '<td>'.$row['SumaGanancias'].'</td>';
+                // echo '<td>'.$row['SumaGanancias'].'</td>';
                 echo '<td>'.$row['GananciaNeta'].'</td>';
                 echo '</tr>';
+
+                // Sumar los valores para los totales
+                $totalDiscount += $row['discount'];
+                $totalSales += $row['TotalVentas'];
+                // $totalPurchaseCost += $row['SumaGanancias'];
+                $totalProfit += $row['GananciaNeta'];
             }
+
             echo '</tbody>';
+            // Mostrar los totales al final de la tabla
+            echo '<tfoot>';
+            echo '<tr class="total">';
+            echo '<td colspan="4">Totales</td>';
+            echo '<td>' . number_format($totalDiscount, 2) . '</td>';
+            echo '<td>' . number_format($totalSales, 2) . '</td>';
+            // echo '<td>' . number_format($totalPurchaseCost, 2) . '</td>';
+            echo '<td>' . number_format($totalProfit, 2) . '</td>';
+            echo '</tr>';
+            echo '</tfoot>';
             echo '</table>';
         } else {
             echo '<p>No se encontraron ventas en este rango de fechas.</p>';
         }
     }
     ?>
-
-    <!-- Código para mostrar el total de ventas en el pie de tabla (footer) -->
-    <!-- ... -->
 
 </div>
 <div class="footer text-center py-4">
@@ -115,3 +158,4 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
+
