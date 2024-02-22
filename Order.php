@@ -92,7 +92,7 @@ $result = $connect->query($sql);
                                 <button type="button" class="btn btn-xs btn-info verDetalle" data-toggle="modal" data-target="#modalDetalle" data-id="<?php echo $row['id']; ?>"><i class="fa fa-eye"></i></button>
                                     <a href="editorder.php?id=<?php echo $row['id']?>"><button type="button" class="btn btn-xs btn-primary"><i class="fa fa-pencil"></i></button></a>
                                     <a href="php_action/removeOrder.php?id=<?php echo $row['id']?>" onclick="return confirm('¿Estás segura de eliminar este registro?')"><button type="button" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></button></a>
-                                    <a href="invoiceprint.php?id=<?php echo $row['id']?>"><button type="button" class="btn btn-xs btn-success"><i class="fa fa-print"></i></button></a>
+                                    
                                 </td>
                             </tr>
                         <?php
@@ -101,45 +101,50 @@ $result = $connect->query($sql);
                         </tbody>
 
                     </table>
-                    <!-- Modal Detalle -->
+                  <!-- Modal Detalle -->
 <div class="modal fade" id="modalDetalle" tabindex="-1" aria-labelledby="modalDetalleLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="modalDetalleLabel">Detalle del Stock</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <!-- Aquí se llenará con el detalle del stock -->
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-      </div>
-    </div>
-  </div>
-</div>
-                </div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalDetalleLabel">Detalle del Stock</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Aquí se llenará con el detalle del stock -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <!-- Script para ver el detalle -->
 <script>
 $(document).ready(function() {
+    // Código para abrir el modal y cargar los detalles
     $('.verDetalle').click(function() {
-        var orderId = $(this).data('id'); // Obtener el ID del pedido
-        // Hacer la solicitud AJAX al mismo archivo
+        var orderId = $(this).data('id');
         $.ajax({
-            url: window.location.href, // Usar la URL actual
+            url: 'php_action/fetchOrderDetails.php',
             type: 'POST',
-            data: {requestType: 'fetchStockDetails', id: orderId, nocache: new Date().getTime()},
+            data: {orderId: orderId},
             success: function(response) {
-                // Llenar el modal con la respuesta del servidor
                 $('#modalDetalle .modal-body').html(response);
+                $('#modalDetalle').modal('show');
             }
         });
+    });
+
+    // Código para forzar el cierre del modal
+    $('#modalDetalle').on('click', '.btn-secondary, .close', function() {
+        $('#modalDetalle').modal('hide').removeClass('show').removeAttr('style');
+        $('.modal-backdrop').remove(); // Remueve el fondo del modal.
+        $('body').removeClass('modal-open').removeAttr('style');
     });
 });
 </script>

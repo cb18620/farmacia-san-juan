@@ -62,11 +62,12 @@
     </form>
 
     <?php 
-    // Inicializar variables para sumar totales
-    $totalDiscount = 0;
-    $totalSales = 0;
-    $totalPurchaseCost = 0;
-    $totalProfit = 0;
+   // Inicialización de variables para sumar totales
+   $totalDiscount = 0;
+   $totalSales = 0;
+   $totalPurchaseCost = 0;
+   $totalProfit = 0;
+   $totalRevenue = 0; // Inicializa la nueva variable para ingresos brutos
 
     if($_SERVER['REQUEST_METHOD'] == 'POST') {
         $startDate = $_POST['startDate'];
@@ -128,6 +129,7 @@
                 $totalSales += $row['TotalVentas'];
                 // $totalPurchaseCost += $row['SumaGanancias'];
                 $totalProfit += $row['GananciaNeta'];
+                $totalRevenue += $row['GananciaNeta'] + $row['TotalVentas']; // Suma Ganancia Neta y Total Ventas
             }
 
             echo '</tbody>';
@@ -140,6 +142,11 @@
             // echo '<td>' . number_format($totalPurchaseCost, 2) . '</td>';
             echo '<td>' . number_format($totalProfit, 2) . '</td>';
             echo '</tr>';
+             // Agrega una nueva fila para mostrar el total de ingresos brutos
+             echo '<tr class="total-revenue">';
+             echo '<td colspan="2">Ingresos Total (Total Ventas + Ganancia)</td>';
+             echo '<td>' . number_format($totalRevenue, 2) . '</td>';
+             echo '</tr>';
             echo '</tfoot>';
             echo '</table>';
         } else {

@@ -4,7 +4,7 @@ date_default_timezone_set('America/La_Paz');
 $localhost = "localhost";
 $username = "root";
 $password = "";
-$dbname = "bdfarmacia";
+$dbname = "nowdemy_pharmacy";
 //$store_url = "http://localhost/phpinventory/";
 
 // db connection
