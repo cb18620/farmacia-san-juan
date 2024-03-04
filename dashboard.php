@@ -27,24 +27,32 @@ $countLowStock2 = $lowStockQuery2->num_rows;
 
 //$connect->close();
 
+// Consulta para obtener la inversión total
+$sqlInversion = "SELECT SUM(CAST(quantity AS DECIMAL(10, 2)) * CAST(rate_compra AS DECIMAL(10, 2))) AS InversionTotal FROM product";
+$resultInversion = $connect->query($sqlInversion);
+$inversionTotal = 0;
+
+if($resultInversion) {
+    $rowInversion = $resultInversion->fetch_assoc();
+    $inversionTotal = $rowInversion['InversionTotal'];
+} else {
+    // Manejo de error de consulta SQL
+    echo "Error en la consulta: " . $connect->error;
+}
+
 // Inicializar el total de ganancias y ventas
 $totalProfit = 0;
 $totalSales = 0;
 
 // Consulta para obtener el total de ventas y ganancias
-$sql = "SELECT SUM(oi.quantity * oi.rate) AS totalSales, 
-               SUM(oi.quantity * (oi.rate - p.rate_compra)) AS totalProfit
-        FROM order_item oi
-        INNER JOIN product p ON oi.productName = p.product_id 
-        WHERE oi.lastid IN (SELECT id FROM orders WHERE delete_status = 0)";
-
+$sql = "SELECT SUM(o.grandTotalValue) - SUM(CAST(oi.quantity AS DECIMAL(10,2)) * CAST(p.rate_compra AS DECIMAL(10,2))) AS GananciaNeta FROM orders o JOIN order_item oi ON o.id = oi.lastid JOIN product p ON oi.productName = p.product_id";
 
 
 if($result = $connect->query($sql)) {
     $row = $result->fetch_assoc();
 
-    $totalSales = $row['totalSales'];
-    $totalProfit = $row['totalProfit'];
+    $totalSales = $row['TotalVentas'];
+    $totalProfit = $row['GananciaNeta'];
     $totalSalesPlusProfit = $totalSales + $totalProfit;
 } else {
     // Manejo de error de consulta SQL
@@ -130,8 +138,8 @@ if($result = $connect->query($sql)) {
                 <span><i class="ti-package"></i></span>
             </div>
             <div class="media-body media-text-right">
-                <h2 class="color-white"><?php echo number_format($totalSalesPlusProfit, 2); ?></h2>
-                <p class="m-b-0">Total Ventas + Ganancias</p>
+            <h2 class="color-white"><?php echo number_format($totalSalesPlusProfit, 2); ?></h2>
+                <p class="m-b-0">Total Ventas</p>
             </div>
         </div>
     </div>
@@ -152,6 +160,20 @@ if($result = $connect->query($sql)) {
                           </div>
                       </div>
                   </div>
+
+                  <div class="col-md-6 dashboard">
+    <div class="card" style="background-color: #F0D300">
+        <div class="media widget-ten">
+            <div class="media-left meida media-middle">
+                <span><i class="ti-money"></i></span>
+            </div>
+            <div class="media-body media-text-right">
+                <h2 class="color-white"><?php echo number_format($inversionTotal, 2); ?></h2>
+                <p class="m-b-0">Inversión Total</p>
+            </div>
+        </div>
+    </div>
+</div>
                             
                    
                    
